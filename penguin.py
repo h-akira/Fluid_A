@@ -57,7 +57,7 @@ def main():
   print('(補) 肺の空気の重さ（深度によらず一定） =',M_l,'kg')
   u_max = 35*1000/3600  # ペンギンの最大速度 m/s
   Re = rho_s*u_max*h_p/mu_s
-  print('(2) ペンギンの最大速度u_max（文献値） =',u_max,'')
+  print('(2) ペンギンの最大速度u_max（文献値） =',u_max,'m/s')
   print('(2) Re =',Re)
   
   b = 0.2  # 羽の長さ m
@@ -90,15 +90,15 @@ def main():
   print('ペンギンの巡航速度を0.8*u_max =',u_p,'m/s と仮定すると，')
   # まずは上下方向の釣り合いを考える
   V_p_4,V_l_4 = get_V(0.99*z_balance,rho_s,g,P_0,tV_p,V_l_0)
-  print('0.99*z_balanceにおける肺の体積はボイルの法則より',V_l_4,'m*3 となり，')
-  print('ペンギンの身の体積は一定より，外形の体積はそれとの足し算で',V_p_4,'m*3 となる．')
+  print('0.99*z_balanceにおける肺の体積はボイルの法則より',V_l_4,'m^3 となり，')
+  print('ペンギンの身の体積は一定より，外形の体積はそれとの足し算で',V_p_4,'m^3 となる．')
   f_wing = (rho_s*V_p_4-M_p)*g  # 上下方向に釣り合うために羽から得なければならない下向きの力（二枚分） N
   print('よって，上下方向の力のつりあいより，')
   print('羽根から得る必要がある下向きの力は',f_wing,'N となる．')
   print('一枚の羽根の長さb =',b,'m，')
   print('一枚の羽根の幅c =',c,'m と仮定し，羽根が二枚あることに注意して，')
   C_L = f_wing/(0.5*rho_s*2*c*b*u_p**2)
-  print('容量係数C_L =',C_L)
+  print('揚力係数C_L =',C_L)
   alpha = C_L/2/numpy.pi
   print('-----[','羽根の角度alpha =',alpha,'rad?',']-----')
 
@@ -125,8 +125,8 @@ def main():
   print('これらを用いて，')
   F_D = 0.5*rho_s*C_D*A_ref*u_p**2
   F_Di = 0.5*rho_s*C_Di*2*c*b*u_p**2
-  print('F_D =',C_D,'N')
-  print('F_Di =',C_Di,'N')
+  print('F_D =',F_D,'N')
+  print('F_Di =',F_Di,'N')
   print('以上より，')
   print('-----[','推進に必要なpower =',(F_D+F_Di)*u_p,'W',']-----')
   
@@ -147,9 +147,36 @@ def main():
   W = F1*(0.5*z_balance) + F2*(0.5*z_balance)  # J
   print('W =',W,'J')
   print('水面に出た時のペンギンの運動エネルギーはWに等しい．')
-  print('ゆえに，飛び出た後の最大の高さは')
-  h = W/(M_p*g)
+  print('ゆえに，45°に飛び出た後の最大の高さは')
+  h = 0.5*W/(M_p*g)
   print('-----[','h =',h,'m',']-----')
+
+  # 先生の式の確認
+  s_p = rho_p/rho_s
+  s_z = rho_a/rho_s
+  l_z = V_l_0/tV_p
+  beta = 0.99
+  ## gamma_check = (s_p-(1-beta)*s_z)*(((s_p-1)+l_z*s_z)-beta*s_z*(2+l_z))/((1-beta)*((s_p-1)+l_z*s_z)*(l_z*(1-s_z)-(s_p-1)))*l_z*eta
+  gamma_check = (s_p-(1-beta)*s_z)*(((s_p-1)+l_z*s_z)-beta*s_z*(0+l_z))/((1-beta)*((s_p-1)+l_z*s_z)*(l_z*(1-s_z)-(s_p-1)))*l_z*eta
+  ## gamma_check = (s_p-(1-beta)*s_z)*(((s_p-1)+l_z*s_z)-beta*s_z*(2+l_z))/((1-beta)*((s_p-1)+l_z*s_z)*(l_z*(1-s_z)-(s_p-1)))*l_z*0.003
+  print('gamma_ =',gamma)
+  print('gamma_check =',gamma_check)
+
+  beta = 0.75
+  Fbg_child = (1-beta)*(M_p-rho_s*tV_p)*(rho_s*(tV_p+V_l_0)-M_p)
+  Fbg_mother = (1-beta)*M_p+beta*rho_s*(tV_p+V_l_0)-rho_s*tV_p
+  Fbg = Fbg_child/Fbg_mother*g
+  print(Fbg,F1)
+  child = (1-beta)*((s_p-1)+l_z*s_z)*(l_z*(1-s_z)-(s_p-1))
+  ## mother = (1-beta)*((s_p-1)+l_z*s_z)+beta*(2+l_z)
+  mother = (1-beta)*((s_p-1)+l_z*s_z)+beta*(l_z)
+  ## mother = (1-beta)*(s_p+l_z*s_z)+beta*(1+l_z)-1
+  Fbg = child/mother/(s_p+l_z*s_z)*M_p*g
+  print(Fbg,F1)
+  ## Fbg=Fbg*(tV_p*rho_s)**0.5
+  ## print(Fbg,F1)
+
+## def get_Fbg(beta,M_p,):
 
 
 
